@@ -18,6 +18,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.impute import SimpleImputer
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OrdinalEncoder, OneHotEncoder, FunctionTransformer
+import category_encoders
 
 import wandb
 from sklearn.ensemble import RandomForestRegressor
@@ -58,6 +59,8 @@ def go(args):
     ######################################
 
     X = pd.read_csv(trainval_local_path)
+    count_encoder = category_encoders.CountEncoder(cols=['host_id', 'neighbourhood'])
+    X = count_encoder.fit_transform(X)
     y = X.pop("price")  # this removes the column "price" from X and puts it into y
 
     logger.info(f"Minimum price: {y.min()}, Maximum price: {y.max()}")
@@ -195,7 +198,9 @@ def get_inference_pipeline(rf_config, max_tfidf_features):
         "calculated_host_listings_count",
         "availability_365",
         "longitude",
-        "latitude"
+        "latitude",
+        "host_id",
+        "neighbourhood",
     ]
     zero_imputer = SimpleImputer(strategy="constant", fill_value=0)
 
