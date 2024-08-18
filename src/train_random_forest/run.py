@@ -101,18 +101,21 @@ def go(args):
     # YOUR CODE HERE
     ######################################
     # Infer the signature of the model
-    signature = mlflow.models.signature.infer_signature(X_val.iloc[:2], y_val[:2])
+    # signature = mlflow.models.signature.infer_signature(X_val.iloc[:2], y_val[:2])
+    # print("!!!!")
+    # print(X_val.iloc[:2])
+    # print(y_val[:2])
     mlflow.sklearn.save_model(
         sk_pipe,
         "random_forest_dir",
-        signature=signature,
+        # signature=signature,
         input_example=X_val.iloc[:2],
         serialization_format=mlflow.sklearn.SERIALIZATION_FORMAT_CLOUDPICKLE
     )
     artifact = wandb.Artifact(args.output_artifact , type="inference_pipeline")
     artifact.add_dir("random_forest_dir")
     run.log_artifact(artifact)
-    artifact.wait()
+    # artifact.wait()
 
     ######################################
     # Upload the model we just exported to W&B
@@ -124,10 +127,12 @@ def go(args):
     ######################################
 
     # Plot feature importance
+    logger.info("plot feature importances")
     fig_feat_imp = plot_feature_importance(sk_pipe, processed_features)
 
     ######################################
     # Here we save r_squared under the "r2" key
+    logger.info("calc summary")
     run.summary['r2'] = r_squared
     # Now log the variable "mae" under the key "mae".
     # YOUR CODE HERE
@@ -139,6 +144,8 @@ def go(args):
           "feature_importance": wandb.Image(fig_feat_imp),
         }
     )
+    logger.info("finish")
+    run.finish()
 
 
 def plot_feature_importance(pipe, feat_names):
@@ -228,7 +235,7 @@ def get_inference_pipeline(rf_config, max_tfidf_features):
     processed_features = ordinal_categorical + non_ordinal_categorical + zero_imputed + ["last_review", "name"]
 
     # Create random forest
-    random_Forest = RandomForestRegressor(**rf_config)
+    random_forest = RandomForestRegressor(**rf_config)
 
     ######################################
     # Create the inference pipeline. The pipeline must have 2 steps: a step called "preprocessor" applying the
@@ -237,7 +244,10 @@ def get_inference_pipeline(rf_config, max_tfidf_features):
     # HINT: Use the explicit Pipeline constructor so you can assign the names to the steps, do not use make_pipeline
     # YOUR CODE HERE
     sk_pipe = Pipeline(
-        steps=[preprocessor, random_Forest]
+        steps=[
+            ("preprocessor", preprocessor),
+            ("random_forest", random_forest)
+        ]
     )
 
     return sk_pipe, processed_features
