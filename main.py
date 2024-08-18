@@ -108,7 +108,7 @@ def go(config: DictConfig):
                     "stratify_by": config['modeling']['stratify_by'],
                     "rf_config": rf_config,
                     "max_tfidf_features": config['modeling']['max_tfidf_features'],
-                    "output_artifact": config['modeling']['stratify_by'],
+                    "output_artifact": "random_forest_export",
                 },
             )
 
@@ -117,7 +117,7 @@ def go(config: DictConfig):
                 os.path.join(hydra.utils.get_original_cwd(), "src", "test_regression_model"),
                 "main",
                 parameters={
-                    "mlflow_model": f"{config['modeling']['stratify_by']}:latest",
+                    "mlflow_model": "random_forest_export:latest",
                     "test_dataset": "test_data.csv:latest"
                 },
             )
