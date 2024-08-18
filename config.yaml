@@ -9,6 +9,7 @@ etl:
   sample: "sample1.csv"
   min_price: 10 # dollars
   max_price: 350 # dollars
+  download_sample: "sample.csv"
   clean_sample: "clean_sample.csv"
 data_check:
   kl_threshold: 0.2

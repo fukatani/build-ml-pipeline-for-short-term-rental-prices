@@ -43,7 +43,7 @@ def go(config: DictConfig):
                 version='main',
                 parameters={
                     "sample": config["etl"]["sample"],
-                    "artifact_name": "sample.csv",
+                    "artifact_name": config["etl"]["download_sample"],
                     "artifact_type": "raw_data",
                     "artifact_description": "Raw file as downloaded"
                 },
@@ -54,7 +54,7 @@ def go(config: DictConfig):
                 os.path.join(hydra.utils.get_original_cwd(), "src", "basic_cleaning"),
                 "main",
                 parameters={
-                    "input_artifact": "sample.csv:latest",
+                    "input_artifact": f'{config["etl"]["download_sample"]}:latest',
                     "output_artifact": config['etl']['clean_sample'],
                     "output_type": "clean_sample",
                     "output_description": "Data with outliers and null values removed",
