@@ -6,27 +6,27 @@ entry_points:
     parameters:
 
       input_artifact:
-        description: ## ADD DESCRIPTION
+        description: Artifact name to be cleaned.
         type: string
 
       output_artifact:
-        description: ## ADD DESCRIPTION
+        description: Cleaned artifact name
         type: string
 
       output_type:
-        description: ## ADD DESCRIPTION
+        description: Type of output artifact
         type: string
 
       output_description:
-        description: ## ADD DESCRIPTION
+        description: Description for output artifact
         type: string
 
       min_price:
-        description: ## ADD DESCRIPTION
+        description: If row price is smaller than min_price, row will be discarded
         type: string
 
       max_price:
-        description: ## ADD DESCRIPTION
+        description: If row price is larger than max_price, row will be discarded
         type: string
 
 
