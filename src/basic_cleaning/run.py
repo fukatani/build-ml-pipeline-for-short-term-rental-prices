@@ -25,6 +25,10 @@ def go(args):
     df = pandas.read_csv(local_path)
     idx = df['price'].between(args.min_price, args.max_price)
     df = df[idx].copy()
+
+    # remove lat/lon outlier
+    idx = df['longitude'].between(-74.25, -73.50) & df['latitude'].between(40.5, 41.2)
+    df = df[idx].copy()
     # df['last_review'] = pd.to_datetime(df['last_review'])
 
     df.to_csv("clean_sample.csv", index=False)
