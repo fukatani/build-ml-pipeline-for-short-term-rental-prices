@@ -43,7 +43,7 @@ def go(args):
 
     logger.info("r2")
     score = r2_score(y_test, y_pred)
-    run.summary["mae"] = score
+    run.summary["r2"] = score
 
 if __name__ == "__main__":
 
