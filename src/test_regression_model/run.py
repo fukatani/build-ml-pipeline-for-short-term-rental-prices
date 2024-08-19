@@ -23,7 +23,7 @@ def go(args):
     # artifact_local_path = run.use_artifact(args.input_artifact).file()
 
     logger.info("Downloading and reading test artifact")
-    test_data_path = run.use_artifact(args.test_data).file()
+    test_data_path = run.use_artifact(args.test_dataset).file()
     df = pandas.read_csv(test_data_path, low_memory=False)
 
     # Extract the target from the features
@@ -33,7 +33,6 @@ def go(args):
 
     logger.info("Downloading and reading the mlflow model")
     model_export_path = run.use_artifact(args.mlflow_model).download()
-
     pipe = mlflow.sklearn.load_model(model_export_path)
 
     y_pred = pipe.predict(X_test)
