@@ -59,8 +59,6 @@ def go(args):
     ######################################
 
     X = pd.read_csv(trainval_local_path)
-    count_encoder = category_encoders.CountEncoder(cols=['host_id', 'neighbourhood'])
-    X = count_encoder.fit_transform(X)
     y = X.pop("price")  # this removes the column "price" from X and puts it into y
 
     logger.info(f"Minimum price: {y.min()}, Maximum price: {y.max()}")
@@ -200,8 +198,6 @@ def get_inference_pipeline(rf_config, max_tfidf_features):
         "availability_365",
         "longitude",
         "latitude",
-        "host_id",
-        "neighbourhood",
     ]
     zero_imputer = SimpleImputer(strategy="constant", fill_value=0)
 
@@ -226,6 +222,12 @@ def get_inference_pipeline(rf_config, max_tfidf_features):
         ),
     )
 
+    count_feature = ['host_id', 'neighbourhood']
+    count_encoder = make_pipeline(
+        category_encoders.CountEncoder(),
+        SimpleImputer(strategy="constant", fill_value=1)
+    )
+
     # Let's put everything together
     preprocessor = ColumnTransformer(
         transformers=[
@@ -233,12 +235,13 @@ def get_inference_pipeline(rf_config, max_tfidf_features):
             ("non_ordinal_cat", non_ordinal_categorical_preproc, non_ordinal_categorical),
             ("impute_zero", zero_imputer, zero_imputed),
             ("transform_date", date_imputer, ["last_review"]),
-            ("transform_name", name_tfidf, ["name"])
+            ("transform_name", name_tfidf, ["name"]),
+            ("count_encoded", count_encoder, count_feature),
         ],
         remainder="drop",  # This drops the columns that we do not transform
     )
 
-    processed_features = ordinal_categorical + non_ordinal_categorical + zero_imputed + ["last_review", "name"]
+    processed_features = ordinal_categorical + non_ordinal_categorical + zero_imputed + ["last_review", "name"] + count_feature
 
     # Create random forest
     random_forest = RandomForestRegressor(**rf_config)
